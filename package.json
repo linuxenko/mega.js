@@ -1,0 +1,36 @@
+{
+  "name": "mega.js",
+  "version": "0.0.1",
+  "description": "JavaScript implementation of Mega.nz API for nodejs and browsers.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "npm run ci",
+    "mocha": "mocha tests/**",
+    "lint": "eslint *.js tests/**",
+    "ci": "npm run lint && npm run mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linuxenko/mega.js.git"
+  },
+  "keywords": [
+    "mega.nz",
+    "mega",
+    "api"
+  ],
+  "author": "Svetlana Linuxenko <linuxenko@yahoo.com> (http://www.linuxenko.pro)",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/linuxenko/mega.js/issues"
+  },
+  "homepage": "https://github.com/linuxenko/mega.js#readme",
+  "devDependencies": {
+    "chai": "^4.1.0",
+    "eslint": "^4.3.0",
+    "mocha": "^3.4.2",
+    "standard": "^10.0.2"
+  }
+}
