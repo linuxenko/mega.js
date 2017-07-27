@@ -39,5 +39,54 @@ var prepareKey = function (a) {
   return pkey;
 };
 
+var b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=';
+var b64a = b64.split('');
+
+// substitute standard base64 special characters to prevent JSON escaping, remove padding
+var base64urlencode = function (data) {
+  var o;
+  var h;
+  var bits;
+
+  var enc = Array.apply(null, Array(Math.ceil(data.length / 3))).map(function (_s, i) {
+    o = Array.apply(null, Array(3)).map(function (_n, x) {
+      return data.charCodeAt(x + i * 3);
+    });
+
+    bits = o[0] << 16 | o[1] << 8 | o[2];
+    h = [(bits >> 18 & 0x3f), (bits >> 12 & 0x3f), (bits >> 6 & 0x3f), (bits & 0x3f)];
+    // use hexets to index into b64, and append result to encoded string
+    return b64a[h[0]] + b64a[h[1]] + b64a[h[2]] + b64a[h[3]];
+  }).join('');
+
+  return (data.length % 3) ? enc.slice(0, (data.length % 3) - 3) : enc;
+};
+
+var base64urldecode = function (data) {
+  var o;
+  var h;
+  var bits;
+
+  return Array.apply(null, Array(Math.ceil(data.length / 4))).map(function (_s, i) {
+    h = Array.apply(null, Array(4)).map(function (_n, x) {
+      return b64.indexOf(data.charAt(x + i * 4));
+    });
+
+    bits = h[0] << 18 | h[1] << 12 | h[2] << 6 | h[3];
+
+    o = [(bits >> 16 & 0xff), (bits >> 8 & 0xff), (bits & 0xff)];
+
+    if (h[2] === 64) {
+      return String.fromCharCode(o[0]);
+    } else if (h[3] === 64) {
+      return String.fromCharCode(o[0], o[1]);
+    }
+
+    return String.fromCharCode(o[0], o[1], o[2]);
+  }).join('').replace(/\0/g, '');
+};
+
 module.exports.str_to_a32 = str2a32;
 module.exports.prepare_key = prepareKey;
+module.exports.base64urlencode = base64urlencode;
+module.exports.base64urldecode = base64urldecode;
