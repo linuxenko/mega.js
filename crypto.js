@@ -76,12 +76,6 @@ var base64urldecode = function (data) {
 
     o = [(bits >> 16 & 0xff), (bits >> 8 & 0xff), (bits & 0xff)];
 
-    if (h[2] === 64) {
-      return String.fromCharCode(o[0]);
-    } else if (h[3] === 64) {
-      return String.fromCharCode(o[0], o[1]);
-    }
-
     return String.fromCharCode(o[0], o[1], o[2]);
   }).join('').replace(/\0/g, '');
 };

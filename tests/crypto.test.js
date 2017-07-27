@@ -25,9 +25,11 @@ describe('Test crypto.js functions', function () {
   });
 
   it('should base64* fns pass brute test', function () {
-    for (var i = 1; i < 100; i++) {
+    for (var i = 1; i < 40; i++) {
       var s = randomstring.generate(i);
       expect(crypt.base64urldecode(crypt.base64urlencode(s))).to.be.equal(s);
     }
+    var btest = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=+*#$@!&*(&#?^%#.,~"\'';
+    expect(crypt.base64urldecode(crypt.base64urlencode(btest))).to.be.equal(btest);
   });
 });
