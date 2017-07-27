@@ -10,7 +10,8 @@
     "test": "npm run ci",
     "mocha": "mocha tests/**",
     "lint": "eslint *.js tests/**",
-    "ci": "npm run lint && npm run mocha"
+    "cov": "nyc npm run mocha && nyc report --reporter=text-lcov | codecov",
+    "ci": "npm run lint && npm run mocha && npm run cov"
   },
   "repository": {
     "type": "git",
@@ -29,8 +30,11 @@
   "homepage": "https://github.com/linuxenko/mega.js#readme",
   "devDependencies": {
     "chai": "^4.1.0",
+    "codecov": "^2.2.0",
     "eslint": "^4.3.0",
+    "eslint-config-standard": "^10.2.1",
     "mocha": "^3.4.2",
+    "nyc": "^11.0.3",
     "standard": "^10.0.2"
   }
 }
