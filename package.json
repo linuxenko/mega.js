@@ -10,7 +10,7 @@
     "test": "npm run ci",
     "mocha": "mocha tests/**",
     "lint": "eslint *.js tests/**",
-    "cov": "nyc npm run mocha && nyc report --reporter=text-lcov | codecov",
+    "cov": "nyc npm run mocha && nyc report --reporter=lcov > coverage.lcov && codecov",
     "ci": "npm run lint && npm run mocha && npm run cov"
   },
   "repository": {
