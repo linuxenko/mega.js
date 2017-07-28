@@ -10,8 +10,9 @@
     "test": "npm run ci",
     "mocha": "mocha tests/**",
     "lint": "eslint *.js tests/**",
-    "cov": "nyc npm run mocha && nyc report --reporter=text-lcov | codecov",
-    "ci": "npm run lint && npm run mocha && npm run cov"
+    "cov": "nyc npm run mocha && nyc report --reporter=lcov > coverage.lcov && codecov",
+    "ci": "npm run lint && npm run browser && npm run mocha && npm run cov",
+    "browser": "karma start"
   },
   "repository": {
     "type": "git",
@@ -29,12 +30,23 @@
   },
   "homepage": "https://github.com/linuxenko/mega.js#readme",
   "devDependencies": {
+    "browserify": "^14.4.0",
     "chai": "^4.1.0",
     "codecov": "^2.2.0",
     "eslint": "^4.3.0",
     "eslint-config-standard": "^10.2.1",
+    "karma": "^1.7.0",
+    "karma-browserify": "^5.1.1",
+    "karma-chai": "^0.1.0",
+    "karma-mocha": "^1.3.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "localenvify": "^1.0.1",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
     "standard": "^10.0.2"
+  },
+  "dependencies": {
+    "sjcl": "^1.0.7",
+    "superagent": "^3.5.2"
   }
 }
