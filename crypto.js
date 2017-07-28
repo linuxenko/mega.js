@@ -2,15 +2,18 @@
  * General mega crypto port
  */
 
+var range = require('./tools').range;
 var sjcl = require('sjcl');
 var Aes = sjcl.cipher.aes;
 
 // string to array of 32-bit words (big endian)
 var str2a32 = function (b) {
   var a = Array((b.length + 3) >> 2);
+
   for (var i = 0; i < b.length; i++) {
     a[i >> 2] |= (b.charCodeAt(i) << (24 - (i & 3) * 8));
   }
+
   return a;
 };
 
@@ -59,7 +62,7 @@ var base64urlencode = function (data) {
   var h;
   var bits;
 
-  var enc = Array.apply(null, Array(Math.ceil(data.length / 3))).map(function (_s, i) {
+  var enc = range(Math.ceil(data.length / 3)).map(function (_s, i) {
     o = Array.apply(null, Array(3)).map(function (_n, x) {
       return data.charCodeAt(x + i * 3);
     });
@@ -78,8 +81,8 @@ var base64urldecode = function (data) {
   var h;
   var bits;
 
-  return Array.apply(null, Array(Math.ceil(data.length / 4))).map(function (_s, i) {
-    h = Array.apply(null, Array(4)).map(function (_n, x) {
+  return range(Math.ceil(data.length / 4)).map(function (_s, i) {
+    h = range(4).map(function (_n, x) {
       return b64.indexOf(data.charAt(x + i * 4));
     });
 
