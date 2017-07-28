@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 var crypt = require('../crypto');
-var randomstring = require('randomstring');
+var randomstring = require('../tools').randomstring;
 
 describe('Test crypto.js functions', function () {
   it('should create str_to_a32 arrays', function () {
@@ -10,7 +10,7 @@ describe('Test crypto.js functions', function () {
 
   it('should pass a32 <-> str brute test', function () {
     for (var i = 1; i < 23; i++) {
-      var s = randomstring.generate(i);
+      var s = randomstring(i);
       expect(crypt.a32_to_str(crypt.str_to_a32(s))).to.be.equal(s);
     }
   });
@@ -33,7 +33,7 @@ describe('Test crypto.js functions', function () {
 
   it('should base64* fns pass brute test', function () {
     for (var i = 1; i < 40; i++) {
-      var s = randomstring.generate(i);
+      var s = randomstring(i);
       expect(crypt.base64urldecode(crypt.base64urlencode(s))).to.be.equal(s);
     }
     var btest = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=+*#$@!&*(&#?^%#.,~"\'';
