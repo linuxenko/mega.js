@@ -7,7 +7,7 @@ var sjcl = require('sjcl');
 var Aes = sjcl.cipher.aes;
 
 // string to array of 32-bit words (big endian)
-var str2a32 = function (b) {
+var s2a = function (b) {
   var a = Array((b.length + 3) >> 2);
 
   for (var i = 0; i < b.length; i++) {
@@ -18,7 +18,7 @@ var str2a32 = function (b) {
 };
 
 // array of 32-bit words to string (big endian)
-var a32tostr = function (a) {
+var a2s = function (a) {
   var b = '';
 
   for (var i = 0; i < a.length * 4; i++) {
@@ -94,8 +94,30 @@ var base64urldecode = function (data) {
   }).join('').replace(/\0/g, '');
 };
 
-module.exports.str_to_a32 = str2a32;
-module.exports.a32_to_str = a32tostr;
-module.exports.prepare_key = prepareKey;
+var stringhash = function (s, aes) {
+  var s32 = s2a(s);
+  var h32 = [0, 0, 0, 0];
+  var i;
+
+  for (i = 0; i < s32.length; i++) {
+    h32[i & 3] ^= s32[i];
+  }
+
+  for (i = 16384; i--;) {
+    h32 = aes.encrypt(h32);
+  }
+
+  return a2base64([h32[0], h32[2]]);
+};
+
+var a2base64 = function (a) {
+  return base64urlencode(a2s(a));
+};
+
+module.exports.s2a = s2a;
+module.exports.a2s = a2s;
+module.exports.stringhash = stringhash;
+module.exports.a2base64 = a2base64;
+module.exports.prepareKey = prepareKey;
 module.exports.base64urlencode = base64urlencode;
 module.exports.base64urldecode = base64urldecode;

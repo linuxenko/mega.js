@@ -1,0 +1,10 @@
+coverage
+.eslintrc.json
+.gitignore
+.eslintignore
+karma.conf.js
+node_modules
+.travis.yml
+.env
+tests
+dist.js
