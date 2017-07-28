@@ -11,4 +11,3 @@ module.exports.login = function (email, password) {
     'uh': uh
   };
 };
-
