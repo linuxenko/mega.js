@@ -8,6 +8,13 @@ describe('Test crypto.js functions', function () {
     expect(crypt.str_to_a32('string')).deep.equal([ 1937011305, 1852243968 ]);
   });
 
+  it('should pass a32 <-> str brute test', function () {
+    for (var i = 1; i < 23; i++) {
+      var s = randomstring.generate(i);
+      expect(crypt.a32_to_str(crypt.str_to_a32(s))).to.be.equal(s);
+    }
+  });
+
   it('should create prepare_key fn', function () {
     expect(crypt.prepare_key).to.be.a('function');
     expect(crypt.prepare_key(crypt.str_to_a32('string'))).deep.equal(

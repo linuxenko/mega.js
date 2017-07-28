@@ -14,6 +14,17 @@ var str2a32 = function (b) {
   return a;
 };
 
+// array of 32-bit words to string (big endian)
+var a32tostr = function (a) {
+  var b = '';
+
+  for (var i = 0; i < a.length * 4; i++) {
+    b = b + String.fromCharCode((a[i >> 2] >>> (24 - (i & 3) * 8)) & 255);
+  }
+
+  return b.replace(/\0/g, '');
+};
+
 // convert user-supplied password array
 var prepareKey = function (a) {
   var i, j, r, key;
@@ -81,6 +92,7 @@ var base64urldecode = function (data) {
 };
 
 module.exports.str_to_a32 = str2a32;
+module.exports.a32_to_str = a32tostr;
 module.exports.prepare_key = prepareKey;
 module.exports.base64urlencode = base64urlencode;
 module.exports.base64urldecode = base64urldecode;
