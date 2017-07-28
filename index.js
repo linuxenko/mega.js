@@ -5,9 +5,11 @@ var request = require('superagent');
 
 var Mega = function (email, password) {
   this.host = 'https://g.api.mega.co.nz/cs';
-  this.seqno = String(Math.ceil(Math.random() * 0x1000000000)).substr(0, 10);
+  this.seqno = String(Math.ceil(Math.random() * 0x10000000000)).substr(0, 10);
   this.sid = null;
   this.lang = 'en';
+
+  this.masterKey = null;
 
   this.email = email;
   this.password = password;
@@ -17,14 +19,18 @@ Mega.prototype.login = function (email, password, cb) {
   if (arguments.length > 1) {
     this.email = email;
     this.password = password;
+  } else {
+    cb = arguments[0] || function () {};
   }
 
   this.request(api.login(this.email, this.password), function (err, res) {
-    if (err) {
+    if (err || !res.body || !res.body[0]) {
       cb(err, null);
     }
-    console.log(res.body[0].csid);
-  });
+
+    this.getsid(res.body[0], this.password);
+    cb();
+  }.bind(this));
 };
 
 Mega.prototype.request = function (cmd, cb) {
@@ -42,5 +48,7 @@ Mega.prototype.request = function (cmd, cb) {
     .send([cmd])
     .end(cb);
 };
+
+Mega.prototype.getsid = api.getsid;
 
 module.exports = Mega;
