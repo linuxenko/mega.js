@@ -83,21 +83,70 @@ var base64urlencode = function (data) {
 };
 
 var base64urldecode = function (data) {
-  var o;
-  var h;
+  data += '=='.substr((2 - data.length * 3) & 3);
+
+  /*  // http://kevin.vanzonneveld.net
+  // +   original by: Tyler Akins (http://rumkin.com)
+  // +   improved by: Thunder.m
+  // +      input by: Aman Gupta
+  // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // +   bugfixed by: Onno Marsman
+  // +   bugfixed by: Pellentesque Malesuada
+  // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // +      input by: Brett Zamir (http://brett-zamir.me)
+  // +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // *     example 1: base64_decode('S2V2aW4gdmFuIFpvbm5ldmVsZA==');
+  // *     returns 1: 'Kevin van Zonneveld'
+  // mozilla has this native
+  // - but breaks in 2.0.0.12!
+  //if (typeof this.window['atob'] === 'function') {
+  //    return atob(data);
+  //} */
+  //
+  //
+  var o1;
+  var o2;
+  var o3;
+  var h1;
+  var h2;
+  var h3;
+  var h4;
   var bits;
+  var i = 0;
+  var ac = 0;
+  var dec = '';
+  var tmpArr = [];
 
-  return range(Math.ceil(data.length / 4)).map(function (_s, i) {
-    h = range(4).map(function (_n, x) {
-      return b64.indexOf(data.charAt(x + i * 4));
-    });
+  if (!data) {
+    return data;
+  }
 
-    bits = h[0] << 18 | h[1] << 12 | h[2] << 6 | h[3];
+  data += '';
 
-    o = [(bits >> 16 & 0xff), (bits >> 8 & 0xff), (bits & 0xff)];
+  do { // unpack four hexets into three octets using index points in b64
+    h1 = b64.indexOf(data.charAt(i++));
+    h2 = b64.indexOf(data.charAt(i++));
+    h3 = b64.indexOf(data.charAt(i++));
+    h4 = b64.indexOf(data.charAt(i++));
 
-    return String.fromCharCode(o[0], o[1], o[2]);
-  }).join('').replace(/\0/g, '');
+    bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
+
+    o1 = bits >> 16 & 0xff;
+    o2 = bits >> 8 & 0xff;
+    o3 = bits & 0xff;
+
+    if (h3 === 64) {
+      tmpArr[ac++] = String.fromCharCode(o1);
+    } else if (h4 === 64) {
+      tmpArr[ac++] = String.fromCharCode(o1, o2);
+    } else {
+      tmpArr[ac++] = String.fromCharCode(o1, o2, o3);
+    }
+  } while (i < data.length);
+
+  dec = tmpArr.join('');
+
+  return dec;
 };
 
 var stringhash = function (s, aes) {
@@ -195,6 +244,20 @@ var decryptKey = function (cipher, a) {
   return x;
 };
 
+var encryptKey = function (cipher, a) {
+  if (!a) {
+    a = [];
+  }
+  if (a.length === 4) {
+    return cipher.encrypt(a);
+  }
+  var x = [];
+  for (var i = 0; i < a.length; i += 4) {
+    x = x.concat(cipher.encrypt([a[i], a[i + 1], a[i + 2], a[i + 3]]));
+  }
+  return x;
+};
+
 /**
  * Decrypts a ciphertext string with the supplied private key.
  *
@@ -238,6 +301,7 @@ module.exports.prepareKey = prepareKey;
 module.exports.base64urlencode = base64urlencode;
 module.exports.base64urldecode = base64urldecode;
 module.exports.decryptKey = decryptKey;
+module.exports.encryptKey = encryptKey;
 module.exports.encodePrivateKey = encodePrivateKey;
 module.exports.decodePrivateKey = decodePrivateKey;
 module.exports.RSADecrypt = RSADecrypt;

@@ -4,6 +4,10 @@
         "mocha" : true
     },
     "extends": "standard",
+    "plugins": [
+        "standard",
+        "promise"
+    ],
     "globals" : {
       "describe" : true,
       "it" : true,
@@ -11,6 +15,7 @@
       "document" : true
     },
     "rules": {
+        "no-unused-expressions": 0,
         "indent": [
             "error",
            2, { "SwitchCase" : 0 }

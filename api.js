@@ -14,6 +14,12 @@ module.exports.login = function (email, password) {
   };
 };
 
+module.exports.getUser = function () {
+  return {
+    'a': 'ug'
+  };
+};
+
 module.exports.getsid = function (data, password) {
   if (typeof data.k !== 'string') {
     throw new Error('Wrong data');
@@ -31,7 +37,7 @@ module.exports.getsid = function (data, password) {
   masterAes = new Aes(master);
 
   if (typeof data.tsid === 'string') {
-    /* later */
+    throw new Error('Tsid auth not implemented');
   } else if (typeof data.csid === 'string') {
     var csid = crypt.base64urldecode(data.csid);
     var privk = null;
@@ -44,9 +50,9 @@ module.exports.getsid = function (data, password) {
 
     if (privk) {
       return {
-        master: master,
-        key: crypt.base64urlencode(RSADecrypt(csid, privk).substr(0, 43)),
-        privkey: privk
+        key: master,
+        sid: crypt.base64urlencode(RSADecrypt(csid, privk).substr(0, 43)),
+        privk: privk
       };
     }
   }
