@@ -292,6 +292,92 @@ var RSADecrypt = function (ciphertext, privkey) {
   return cleartext.substr(2);
 };
 
+// array of 32-bit words ArrayBuffer (big endian)
+var a32ToAb = function (a) {
+  var ab = new Uint8Array(4 * a.length);
+
+  for (var i = 0; i < a.length; i++) {
+    ab[4 * i] = a[i] >>> 24;
+    ab[4 * i + 1] = a[i] >>> 16 & 255;
+    ab[4 * i + 2] = a[i] >>> 8 & 255;
+    ab[4 * i + 3] = a[i] & 255;
+  }
+
+  return ab;
+};
+
+// ArrayBuffer to binary with depadding
+var abToStrDepad = function (ab) {
+  var b = '';
+  var ab8 = new Uint8Array(ab);
+
+  for (var i = 0; i < ab8.length && ab8[i]; i++) {
+    b = b + String.fromCharCode(ab8[i]);
+  }
+
+  return b;
+};
+
+// binary string to ArrayBuffer, 0-padded to AES block size
+var str2ab = function (b) {
+  var ab = new ArrayBuffer((b.length + 15) & -16);
+  var u8 = new Uint8Array(ab);
+
+  for (var i = b.length; i--;) {
+    u8[i] = b.charCodeAt(i);
+  }
+
+  return ab;
+};
+
+var from8 = function (utf8) {
+  return decodeURIComponent(escape(utf8));
+};
+
+// binary string to ArrayBuffer, 0-padded to AES block size
+var base642ab = function (a) {
+  return str2ab(base64urldecode(a));
+};
+
+// decrypt attributes block using AES-CBC, check for MEGA canary
+// attr = ab, key as with enc_attr
+// returns [Object] or false
+var decodeAttr = function (attr, key) {
+  var b;
+
+  attr = rsaasm.AES_CBC.decrypt(attr,
+    a32ToAb([key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7]]), false);
+  b = abToStrDepad(attr);
+
+  if (b.substr(0, 6) !== 'MEGA{"') {
+    return false;
+  }
+
+  try {
+    return JSON.parse(from8(b.substr(4)));
+  } catch (e) {
+    var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/);
+    var s = m && m[1];
+    var l = s && s.length || 0;
+    var j = ',';
+
+    while (l--) {
+      s = s.substr(0, l || 1);
+    }
+
+    if (~l) {
+      try {
+        var name = s + j + 'trunc' + Math.random().toString(16).slice(-4) + (m[2] || '');
+        return JSON.parse(from8(b.substr(4).replace(m[0], '"n":"' + name + '"')));
+      } catch (e) {}
+    }
+
+    return {
+      n: 'MALFORMED_ATTRIBUTES'
+    };
+  }
+};
+
 module.exports.s2a = s2a;
 module.exports.a2s = a2s;
 module.exports.stringhash = stringhash;
@@ -305,3 +391,4 @@ module.exports.encryptKey = encryptKey;
 module.exports.encodePrivateKey = encodePrivateKey;
 module.exports.decodePrivateKey = decodePrivateKey;
 module.exports.RSADecrypt = RSADecrypt;
+module.exports.decodeAttr = decodeAttr;

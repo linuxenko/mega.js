@@ -20,6 +20,38 @@ module.exports.getUser = function () {
   };
 };
 
+module.exports.getFiles = function () {
+  return {
+    'a': 'f',
+    'c': 1
+  };
+};
+
+module.exports.decodeFileNames = function (files) {
+  var master = this.key;
+
+  return files.map(function (file) {
+    if (file.t === 1 || file.t === 0) {
+      var key = null;
+      var sec = file.k.split(':');
+
+      if (file['u'] === sec[0]) {
+        var attributes = crypt.base64urldecode(file['a']);
+        key = crypt.decryptKey(new Aes(master), crypt.base642a(sec[1]));
+        attributes = crypt.decodeAttr(attributes, key);
+
+        if (attributes.n) {
+          file.name = attributes.n;
+        }
+
+        return file;
+      }
+    }
+
+    return file;
+  });
+};
+
 module.exports.getsid = function (data, password) {
   if (typeof data.k !== 'string') {
     throw new Error('Wrong data');

@@ -25,15 +25,43 @@ describe('Test Mega', function () {
   });
 
   it('should successfully log user in', function (done) {
+    if (process.env['_mega']) {
+      var obj = JSON.parse(process.env['_mega']);
+
+      Object.keys(obj).map(function (key) {
+        mega[key] = obj[key];
+      });
+
+      mega.seqno++;
+
+      console.log('_restore');
+      return done();
+    }
+
     mega.login(process.env.USERNAME, process.env.USER_PASSWORD, function (err, response) {
       expect(err).to.be.not.exist;
       expect(mega.email).to.be.equal(process.env.USERNAME);
       expect(mega.sid.length).to.equal(58);
+
+      process.env['_mega'] = JSON.stringify(mega);
+      done();
+    });
+  });
+
+  it('should retrieve list of files', function (done) {
+    mega.getFiles(function (err, files) {
+      expect(err).to.be.not.exist;
+
       done();
     });
   });
 
   it('should successfully get user info', function (done) {
+    if (process.env['_skip_getuser']) {
+      console.log('_skip');
+      done();
+      return;
+    }
     expect(mega.sid).to.be.exist;
     expect(mega.email).to.be.equal(process.env.USERNAME);
 
@@ -42,6 +70,7 @@ describe('Test Mega', function () {
 
       expect(info).to.be.an('array');
       expect(info[0].email).to.be.equal(process.env.USERNAME);
+      process.env['_skip_getuser'] = true;
       done();
     });
   });

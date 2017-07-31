@@ -7,6 +7,8 @@ var Mega = function (email, password) {
   this.host = 'https://g.api.mega.co.nz/cs';
   this.seqno = -Math.ceil(Math.random() * 0x1000000000);
   this.sid = null;
+  this.key = null;
+  this.privk = null;
   this.lang = 'en';
 
   this.email = email;
@@ -37,6 +39,7 @@ Mega.prototype.login = function (email, password, cb) {
     this.sid = ksid.sid;
     this.privk = ksid.privk;
     this.key = ksid.key;
+
     cb(null, res.body);
   }.bind(this));
 };
@@ -49,6 +52,17 @@ Mega.prototype.getUser = function (cb) {
 
     cb(null, res.body);
   });
+};
+
+Mega.prototype.getFiles = function (cb) {
+  this.request(api.getFiles(), function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    res.body[0].f = this.decodeFileNames(res.body[0].f);
+    cb(null, res.body);
+  }.bind(this));
 };
 
 Mega.prototype.request = function (cmd, cb) {
@@ -68,5 +82,6 @@ Mega.prototype.request = function (cmd, cb) {
 };
 
 Mega.prototype.getsid = api.getsid;
+Mega.prototype.decodeFileNames = api.decodeFileNames;
 
 module.exports = Mega;
