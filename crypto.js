@@ -358,7 +358,7 @@ var decodeAttr = function (attr, key) {
   } catch (e) {
     var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/);
     var s = m && m[1];
-    var l = s && s.length || 0;
+    var l = (s && s.length) || 0;
     var j = ',';
 
     while (l--) {
@@ -392,3 +392,4 @@ module.exports.encodePrivateKey = encodePrivateKey;
 module.exports.decodePrivateKey = decodePrivateKey;
 module.exports.RSADecrypt = RSADecrypt;
 module.exports.decodeAttr = decodeAttr;
+module.exports.base642ab = base642ab;
