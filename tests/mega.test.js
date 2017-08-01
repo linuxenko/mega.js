@@ -49,9 +49,14 @@ describe('Test Mega', function () {
   });
 
   it('should retrieve list of files', function (done) {
+    if (process.env['_skip_files_list']) {
+      console.log('_skip');
+      return done();
+    }
+
     mega.getFiles(function (err, files) {
       expect(err).to.be.not.exist;
-
+      process.env['_skip_files_list'] = true;
       done();
     });
   });
@@ -59,8 +64,7 @@ describe('Test Mega', function () {
   it('should successfully get user info', function (done) {
     if (process.env['_skip_getuser']) {
       console.log('_skip');
-      done();
-      return;
+      return done();
     }
     expect(mega.sid).to.be.exist;
     expect(mega.email).to.be.equal(process.env.USERNAME);

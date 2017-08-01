@@ -27,6 +27,14 @@ module.exports.getFiles = function () {
   };
 };
 
+module.exports.getDownloadFileUrl = function (fileHandle) {
+  return {
+    'a': 'g',
+    'g': 1,
+    'n': fileHandle
+  };
+};
+
 module.exports.decodeFileNames = function (files) {
   var master = this.key;
 
