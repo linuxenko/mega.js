@@ -5,8 +5,10 @@ var request = require('superagent');
 
 var Mega = function (email, password) {
   this.host = 'https://g.api.mega.co.nz/cs';
-  this.seqno = String(Math.ceil(Math.random() * 0x1000000000)).substr(0, 10);
+  this.seqno = -Math.ceil(Math.random() * 0x1000000000);
   this.sid = null;
+  this.key = null;
+  this.privk = null;
   this.lang = 'en';
 
   this.email = email;
@@ -17,14 +19,50 @@ Mega.prototype.login = function (email, password, cb) {
   if (arguments.length > 1) {
     this.email = email;
     this.password = password;
+  } else {
+    cb = arguments[0] || function () {};
   }
 
   this.request(api.login(this.email, this.password), function (err, res) {
-    if (err) {
-      cb(err, null);
+    if (err || !res.body || !res.body[0]) {
+      return cb(err);
     }
-    console.log(res.body[0].csid);
+
+    var ksid = null;
+
+    try {
+      ksid = this.getsid(res.body[0], this.password);
+    } catch (err) {
+      return cb(err);
+    }
+
+    this.sid = ksid.sid;
+    this.privk = ksid.privk;
+    this.key = ksid.key;
+
+    cb(null, res.body);
+  }.bind(this));
+};
+
+Mega.prototype.getUser = function (cb) {
+  this.request(api.getUser(), function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, res.body);
   });
+};
+
+Mega.prototype.getFiles = function (cb) {
+  this.request(api.getFiles(), function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    res.body[0].f = this.decodeFileNames(res.body[0].f);
+    cb(null, res.body);
+  }.bind(this));
 };
 
 Mega.prototype.request = function (cmd, cb) {
@@ -42,5 +80,8 @@ Mega.prototype.request = function (cmd, cb) {
     .send([cmd])
     .end(cb);
 };
+
+Mega.prototype.getsid = api.getsid;
+Mega.prototype.decodeFileNames = api.decodeFileNames;
 
 module.exports = Mega;

@@ -11,7 +11,7 @@ describe('Test crypto.js functions', function () {
   it('should pass a32 <-> str brute test', function () {
     for (var i = 1; i < 23; i++) {
       var s = randomstring(i);
-      expect(crypt.a2s(crypt.s2a(s))).to.be.equal(s);
+      expect(crypt.a2s(crypt.s2a(s)).replace(/\0/g, '')).to.be.equal(s);
     }
   });
 
